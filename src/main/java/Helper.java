@@ -222,9 +222,9 @@ public class Helper {
 
         // Parse output as JSON array using Gson
         Gson gson = new Gson();
-        List<String> endpoints = gson.fromJson(output, new TypeToken<List<String>>() {}.getType());
+        List<String> params = gson.fromJson(output, new TypeToken<List<String>>() {}.getType());
 
-        for (String url : endpoints) {
+        for (String url : params) {
             addParameterIfNotExists(url);
         }
     }

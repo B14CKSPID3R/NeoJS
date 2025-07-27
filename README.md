@@ -1,7 +1,7 @@
 # NeoJS 🔍
 
 <div align="center">
-  <img src="banner2.jpg" alt="NeoJS Banner" width="100%">
+  <img src="banner.jpg" alt="NeoJS Banner" width="100%"><br>
 </div>
 
 <div align="center">
@@ -57,27 +57,6 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 - **Modern UI**: Clean, intuitive interface with dark/light theme support
 - **Tabbed Interface**: Organized tabs for different analysis functions
 - **Real-time Updates**: Live updates of discovered endpoints and parameters
-- **Export Capabilities**: Export results in various formats
-
-## 🏗️ Architecture
-
-```
-NeoJS/
-├── src/main/java/
-│   ├── Main.java                 # Burp extension entry point
-│   ├── UI.java                   # User interface components
-│   ├── CustomHTTPHandler.java    # HTTP request/response processing
-│   ├── CustomProxyHandler.java   # Proxy request handling
-│   ├── JSUrlProcessor.java      # JavaScript URL processing
-│   ├── ExtractInlineScripts.java # Inline script extraction
-│   ├── ExtractAttributeScripts.java # Attribute script processing
-│   └── Helper.java              # Utility functions
-├── plugins/
-│   ├── JSExtractor/             # JavaScript analysis plugins
-│   ├── JSRequests/              # Request generation tools
-│   └── JSParams/                # Parameter extraction tools
-└── resources/                   # Embedded JavaScript tools
-```
 
 ## 🚀 Installation & Build
 
@@ -92,16 +71,19 @@ NeoJS/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/NeoJS.git
+   git clone https://github.com/B14CK-SPID3R/NeoJS.git
    cd NeoJS
    ```
 
 2. **Build the project**
    ```bash
    # On Windows
+   build_plugins.bat
    gradlew.bat build
    
    # On Linux/macOS
+   chmod +x ./build_plugins.sh
+   ./build_plugins.sh
    ./gradlew build
    ```
 
@@ -120,8 +102,9 @@ NeoJS/
 1. **Load the Extension**: Install NeoJS in Burp Suite
 2. **Navigate to NeoJS Tab**: Find the "Neo JS" tab in Burp Suite
 3. **Configure Settings**: Set up your analysis preferences
-4. **Start Browsing**: Begin your web application testing (Clear your cache or use Burp Suite's browser to avoid caching issues)
-5. **Review Results**: Check the Analysis tab for discovered endpoints
+4. **Define your scope**: If you want to process in-scope javascript files
+5. **Start Browsing**: Begin your web application testing (Clear your cache or use Burp Suite's browser to avoid caching issues)
+6. **Review Results**: Run your favorite tools that you've added on Tools tab and check the Extractor tab for discovered endpoints/parameters/source map files
 
 ### Advanced Configuration
 
@@ -133,28 +116,33 @@ NeoJS/
 #### Tool Configuration
 - **Custom Tools**: Add your own analysis tools
 - **Domain Organization**: Organize results by domain
-- **Export Options**: Configure result export formats
 
 ### Plugin Usage (You can use them as standalone tools)
 
 #### Endpoint Extraction
 ```bash
-node JSEndpoints.js /path/to/javascript/files
+node JSEndpoints.js /path/to/javascript/dir
 ```
 
 #### Parameter Analysis
 ```bash
-node JSParameters.js /path/to/javascript/files
+node JSParameters.js /path/to/javascript/dir
 ```
 
 #### Request Generation
 ```bash
-node JSRequests.js --proxy http://127.0.0.1:8080 target-domain.com
+node JSRequests.js --proxy http://127.0.0.1:8080 /path/to/javascript/dir
 ```
 
 ## 🔧 Configuration
 
 ### Extension Settings
+**Windows:**
+- **Base Path**: `%USERPROFILE%\.NeoJS`
+- **Plugin Directory**: `%USERPROFILE%\.NeoJS\plugins\`
+- **Configuration**: `%USERPROFILE%\.NeoJS\tools.json`
+
+**Linux:**
 - **Base Path**: `~/.NeoJS/files/`
 - **Plugin Directory**: `~/.NeoJS/plugins/`
 - **Configuration**: `~/.NeoJS/tools.json`
@@ -170,20 +158,10 @@ node JSRequests.js --proxy http://127.0.0.1:8080 target-domain.com
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **Burp Suite Team** for the excellent Montoya API
-- **JSoup** for HTML parsing capabilities
-- **Babel Parser** for JavaScript AST analysis
-- **Axios** for HTTP request handling
-
 ---
 
 <div align="center">
 
 **Made with ❤️ for the security community**
-
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/NeoJS?style=social)](https://github.com/yourusername/NeoJS)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/NeoJS?style=social)](https://github.com/yourusername/NeoJS)
 
 </div> 

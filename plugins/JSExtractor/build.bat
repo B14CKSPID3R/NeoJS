@@ -1,1 +1,0 @@
-esbuild JSParameters.js --bundle --platform=node --minify --outfile=dist/jsparams.js && esbuild JSEndpoints.js --bundle --platform=node --minify --outfile=dist/jsendpoints.js
