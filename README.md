@@ -15,6 +15,17 @@
 
 </div>
 
+## Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Installation & Build](#-installation--build)
+- [Usage](#-usage)
+- [Configuration](#-configuration)
+- [Performance](#-performance)
+- [Contact](#-contact)
+- [License](#-license)
+
 ---
 
 ## 🚀 Overview
@@ -62,10 +73,10 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 
 ### Prerequisites
 
-- **Java 21** or higher
-- **Gradle 8.0+**
-- **Burp Suite Professional** (2024.5+)
-- **Node.js** (for plugins)
+- **Java 21** or higher (You need `java` and `javac` to compile the extension. So you can install `openjdk-21-jdk`)
+- **Gradle 8.0+** 
+- **Burp Suite** (2024.5+)
+- **Node.js** (You need `node` and `esbuild` to compile plugins)
 
 ### Building the Project
 
@@ -117,21 +128,23 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 - **Custom Tools**: Add your own analysis tools
 - **Domain Organization**: Organize results by domain
 
-### Plugin Usage (You can use them as standalone tools)
+### Plugin Usage (Also works as standalone tools)
 
 #### Endpoint Extraction
 ```bash
-node JSEndpoints.js /path/to/javascript/dir
+node jsendpoints.js --file <filepath>
+node jsendpoints.js --directory <dirpath>
 ```
 
 #### Parameter Analysis
 ```bash
-node JSParameters.js /path/to/javascript/dir
+node jsparams.js --file <filepath>
+node jsparams.js --directory <dirpath>
 ```
 
 #### Request Generation
 ```bash
-node JSRequests.js --proxy http://127.0.0.1:8080 /path/to/javascript/dir
+node jsrequests.js --proxy http://127.0.0.1:8080 --silent <dirpath>
 ```
 
 ## 🔧 Configuration
@@ -153,6 +166,10 @@ node JSRequests.js --proxy http://127.0.0.1:8080 /path/to/javascript/dir
 - **Efficient Caching**: Prevents duplicate processing
 - **Memory Optimization**: Optimized for large-scale analysis
 - **Real-time Processing**: Minimal latency in request processing
+
+## 📧 Contact
+
+- **X:** https://x.com/B14CK_SPID3R
 
 ## 📝 License
 
