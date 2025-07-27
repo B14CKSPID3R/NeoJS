@@ -1,0 +1,1 @@
+esbuild JSRequests.js --bundle --platform=node --minify --outfile=dist/bundle.js

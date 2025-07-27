@@ -1,0 +1,20 @@
+{
+  "name": "js-http-analyzer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/parser": "^7.27.4",
+    "@babel/traverse": "^7.27.4",
+    "axios": "^1.9.0",
+    "https-proxy-agent": "^5.0.1",
+    "p-limit": "^6.2.0",
+    "proxy-agent": "^6.5.0"
+  }
+}
