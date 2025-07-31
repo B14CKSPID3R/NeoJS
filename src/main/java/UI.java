@@ -667,34 +667,28 @@ public class UI extends JTabbedPane {
     }
 
     private Component createAboutTab() {
-        int contentWidth = 800;
-        int imageWidth = 310;
-
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(currentTheme.equalsIgnoreCase("dark") ? getBackground() : new Color(248, 248, 248));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout(20, 0));
-        contentPanel.setPreferredSize(new Dimension(contentWidth, 550));
+        JPanel contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(currentTheme.equalsIgnoreCase("dark") ? getBackground().darker() : getBackground().brighter());
         contentPanel.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(currentTheme.equalsIgnoreCase("dark") ? getBackground().brighter() : getBackground().darker(), 1),
                 new EmptyBorder(20, 20, 20, 20)
         ));
 
-// ========== LEFT SIDE: Features ==========
+        // ========== LEFT SIDE: Features ==========
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.setPreferredSize(new Dimension(contentWidth, 550));
         leftPanel.setBackground(currentTheme.equalsIgnoreCase("dark") ? getBackground().darker() : getBackground().brighter());
 
-        // Add title
         JLabel titleLabel = new JLabel(">>> Neo JS");
         titleLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, 36));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
+        titleLabel.setBorder(new EmptyBorder(0, 0, 20, 0));
         leftPanel.add(titleLabel);
+        leftPanel.add(Box.createVerticalStrut(50));
 
         String[] features = {
                 "🕷️ JavaScript static analysis capabilities",
@@ -705,36 +699,39 @@ public class UI extends JTabbedPane {
                 "🕷️ Domain-specific JavaScript analysis"
         };
 
-        leftPanel.add(Box.createVerticalGlue());
         for (String feature : features) {
             JLabel label = new JLabel(feature);
             label.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
-            label.setBorder(new EmptyBorder(0, 0, 25, 0));
+            label.setBorder(new EmptyBorder(0, 0, 15, 0));
             leftPanel.add(label);
         }
-        leftPanel.add(Box.createVerticalGlue());
 
-// ========== RIGHT SIDE: Image ==========
-        JPanel rightPanel = new JPanel();
-        rightPanel.setPreferredSize(new Dimension(imageWidth, 550));
+        // ========== RIGHT SIDE: Image ==========
+        JPanel rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setBackground(currentTheme.equalsIgnoreCase("dark") ? getBackground().darker() : getBackground().brighter());
 
         try {
             File imageFile = new File(Paths.get(Main.DEFAULT_BASE_PATH.getParent().toString(), "neo.png").toUri());
             BufferedImage originalImage = ImageIO.read(imageFile);
 
-            int scaledW = (int)(originalImage.getWidth() * 0.65);
-            int scaledH = (int)(originalImage.getHeight() * 0.65);
+            int scaledW = (int) (originalImage.getWidth() * 0.65);
+            int scaledH = (int) (originalImage.getHeight() * 0.65);
 
-            Image scaled = originalImage.getScaledInstance(scaledW, scaledH, Image.SCALE_SMOOTH);
+//            Image scaled = originalImage.getScaledInstance(scaledW, scaledH, Image.SCALE_SMOOTH);
+            BufferedImage scaledImage = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = scaledImage.createGraphics();
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(originalImage, 0, 0, scaledW, scaledH, null);
+            g2d.dispose();
 
             BufferedImage ellipse = new BufferedImage(scaledW, scaledH, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = ellipse.createGraphics();
             g2.setClip(new Ellipse2D.Double(0, 0, scaledW, scaledH));
-            g2.drawImage(scaled, 0, 0, null);
+            g2.drawImage(scaledImage, 0, 0, null);
             g2.dispose();
 
-            // Create a panel with elliptic border for the image
             JPanel imagePanel = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
@@ -757,42 +754,70 @@ public class UI extends JTabbedPane {
 
             JLabel imgLabel = new JLabel(new ImageIcon(ellipse));
             imagePanel.add(imgLabel);
+
             rightPanel.add(imagePanel);
 
         } catch (Exception e) {
             rightPanel.add(new JLabel("Image not found"));
         }
 
-// ========== Footer ==========
+        // ========== Footer ==========
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setBackground(currentTheme.equalsIgnoreCase("dark") ? getBackground().darker() : getBackground().brighter());
         footer.setBorder(new EmptyBorder(10, 0, 0, 0));
 
         JLabel createdByLabel = new JLabel("Created by:");
-        createdByLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14)); // Change font family, style, and size
+        createdByLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         footer.add(createdByLabel);
 
         JButton githubButton = createLinkButton("B14CK-SPID3R", "https://github.com/B14CK-SPID3R");
-        githubButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14)); // Set font for first button
+        githubButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
         footer.add(githubButton);
+
         footer.add(Box.createHorizontalStrut(100));
+
         JButton twitterButton = createLinkButton("@B14CK_SPID3R", "https://x.com/B14CK_SPID3R");
-        twitterButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14)); // Set font for second button
+        twitterButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
         footer.add(twitterButton);
 
-// ========== Assemble ==========
-        contentPanel.add(leftPanel, BorderLayout.WEST);
-        contentPanel.add(rightPanel, BorderLayout.EAST);
-        contentPanel.add(footer, BorderLayout.SOUTH);
+        // ========== Add LEFT and RIGHT panels with GridBag ==========
+        GridBagConstraints gbcLeft = new GridBagConstraints();
+        gbcLeft.gridx = 0;
+        gbcLeft.gridy = 0;
+        gbcLeft.weightx = 0.7;
+        gbcLeft.weighty = 1.0;
+        gbcLeft.fill = GridBagConstraints.BOTH;
+        gbcLeft.insets = new Insets(0, 0, 0, 10); // gap between left and right
+        contentPanel.add(leftPanel, gbcLeft);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(contentPanel, gbc);
+        GridBagConstraints gbcRight = new GridBagConstraints();
+        gbcRight.gridx = 1;
+        gbcRight.gridy = 0;
+        gbcRight.weightx = 0.3;
+        gbcRight.weighty = 1.0;
+        gbcRight.fill = GridBagConstraints.BOTH;
+        contentPanel.add(rightPanel, gbcRight);
+
+        GridBagConstraints gbcFooter = new GridBagConstraints();
+        gbcFooter.gridx = 0;
+        gbcFooter.gridy = 1;
+        gbcFooter.gridwidth = 2;
+        gbcFooter.weightx = 1.0;
+        gbcFooter.fill = GridBagConstraints.HORIZONTAL;
+        gbcFooter.insets = new Insets(20, 0, 0, 0);
+        contentPanel.add(footer, gbcFooter);
+
+        // ========== Add Content Panel to Main Panel ==========
+        GridBagConstraints gbcMain = new GridBagConstraints();
+        gbcMain.gridx = 0;
+        gbcMain.gridy = 0;
+        gbcMain.weightx = 1.0;
+        gbcMain.weighty = 1.0;
+        gbcMain.fill = GridBagConstraints.BOTH;
+        panel.add(contentPanel, gbcMain);
 
         return panel;
     }
-
 
     private void executeToolOnDomain(String domain, String tool) {
         try {

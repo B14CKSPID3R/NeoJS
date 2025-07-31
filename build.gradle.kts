@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.portswigger.burp.extensions:montoya-api:2025.7")
+    implementation("net.portswigger.burp.extensions:montoya-api:2025.5")
     implementation("org.jsoup:jsoup:1.16.1")
     implementation("org.json:json:20240303")
     implementation("com.fifesoft:rsyntaxtextarea:3.3.4")
