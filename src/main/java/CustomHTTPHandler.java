@@ -67,7 +67,7 @@ public class CustomHTTPHandler implements HttpHandler {
         List<HttpHeader> headers = request.headers();
         String path = request.pathWithoutQuery().toLowerCase();
         String body = httpResponseReceived.bodyToString();
-        URI uri = null;
+        URI uri;
         try {
             uri = new URI(request.url());
         } catch (URISyntaxException e) {

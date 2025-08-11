@@ -43,7 +43,7 @@ public class Helper {
         return sb.toString();
     }
 
-    public static Path getHierarchicalPath(URI uri) throws IOException {
+    public static Path getHierarchicalPath(URI uri) {
         String host = uri.getHost(); // e.g., example.com
         String rawPath = uri.getPath(); // e.g., /assets/js/app.js
 

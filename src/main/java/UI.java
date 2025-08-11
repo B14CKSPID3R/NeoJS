@@ -155,7 +155,7 @@ public class UI extends JTabbedPane {
 
             new SwingWorker<Void, String>() {
                 @Override
-                protected Void doInBackground() throws Exception {
+                protected Void doInBackground() {
                     executeToolOnDomain(selectedDomain, selectedTool);
                     return null;
                 }
