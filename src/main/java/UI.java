@@ -60,15 +60,15 @@ public class UI extends JTabbedPane {
 
         setFont(new Font("Segoe UI", Font.PLAIN, 11));
         addTab(" Analysis ", createAnalysisTab());
-        addTab(" Tools ", createToolsTab());
         addTab(" Extractor ", createExtractorTab());
+        addTab(" Tools ", createToolsTab());
         addTab(" Configuration ", createConfigurationTab());
         addTab(" About ", createAboutTab());
     }
 
     private JPanel createAnalysisTab() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding کل پنل
 
         outputArea.setEditable(false);
         outputArea.setLineWrap(true);
@@ -76,7 +76,7 @@ public class UI extends JTabbedPane {
 
         JPanel topControls = new JPanel();
         topControls.setLayout(new BoxLayout(topControls, BoxLayout.X_AXIS));
-        topControls.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0)); // bottom padding
+        topControls.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0)); // فقط padding پایین قبلی
 
         JLabel domainLabel = new JLabel("🌐 Domain:");
         domainLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
@@ -98,16 +98,19 @@ public class UI extends JTabbedPane {
         Dimension buttonSize = new Dimension(170, 30);
 
         JButton runButton = new JButton(" ▶ Run ");
+        runButton.setFont(runButton.getFont().deriveFont(Font.BOLD));
         runButton.setPreferredSize(buttonSize);
         runButton.setMaximumSize(buttonSize);
         runButton.setMinimumSize(buttonSize);
 
         JButton clearOutput = new JButton(" 🚮 Clear ");
+        clearOutput.setFont(clearOutput.getFont().deriveFont(Font.BOLD));
         clearOutput.setPreferredSize(buttonSize);
         clearOutput.setMaximumSize(buttonSize);
         clearOutput.setMinimumSize(buttonSize);
 
         JButton deleteButton = new JButton(" ❌ Delete Domain");
+        deleteButton.setFont(deleteButton.getFont().deriveFont(Font.BOLD));
         deleteButton.setPreferredSize(buttonSize);
         deleteButton.setMaximumSize(buttonSize);
         deleteButton.setMinimumSize(buttonSize);
@@ -126,6 +129,13 @@ public class UI extends JTabbedPane {
         topControls.add(Box.createHorizontalStrut(10));
         topControls.add(deleteButton);
 
+        JPanel framedTopControls = new JPanel(new BorderLayout());
+        framedTopControls.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(""),
+                BorderFactory.createEmptyBorder(10, 10, 0, 10)
+        ));
+        framedTopControls.add(topControls, BorderLayout.CENTER);
+
         runButton.addActionListener(e -> {
             String selectedDomain = (String) domainSelector.getSelectedItem();
             String selectedTool = (String) toolSelector.getSelectedItem();
@@ -140,22 +150,18 @@ public class UI extends JTabbedPane {
                 return;
             }
 
-            // Disable button during execution
             runButton.setEnabled(false);
             runButton.setText("Running...");
 
-            // Create and execute background worker
             new SwingWorker<Void, String>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    // This runs in background thread
                     executeToolOnDomain(selectedDomain, selectedTool);
                     return null;
                 }
 
                 @Override
                 protected void process(List<String> chunks) {
-                    // Update output area in EDT
                     for (String message : chunks) {
                         outputArea.append(message + "\n");
                     }
@@ -164,18 +170,18 @@ public class UI extends JTabbedPane {
                 @Override
                 protected void done() {
                     try {
-                        get(); // Check for exceptions
+                        get();
                         outputArea.append("Execution completed successfully!\n");
                     } catch (Exception ex) {
                         outputArea.append("Error: " + ex.getMessage() + "\n");
                     } finally {
-                        // Re-enable button in EDT
                         runButton.setEnabled(true);
                         runButton.setText(" ▶ Run ");
                     }
                 }
             }.execute();
         });
+
         clearOutput.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(panel,
                     "Are you sure you want to clear output box?",
@@ -187,6 +193,7 @@ public class UI extends JTabbedPane {
                 outputArea.setText("");
             }
         });
+
         deleteButton.addActionListener(e -> {
             String selectedDomain = (String) domainSelector.getSelectedItem();
             if (selectedDomain == null || selectedDomain.isEmpty()) {
@@ -201,12 +208,12 @@ public class UI extends JTabbedPane {
                     JOptionPane.WARNING_MESSAGE);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                File domainFolder = new File(Main.DEFAULT_BASE_PATH + File.separator + selectedDomain); // 🔧 Adjust this path
+                File domainFolder = new File(Main.DEFAULT_BASE_PATH + File.separator + selectedDomain);
                 if (domainFolder.exists() && domainFolder.isDirectory()) {
                     boolean success = Helper.deleteDirectoryRecursively(domainFolder);
                     if (success) {
                         JOptionPane.showMessageDialog(panel, "Domain folder deleted successfully.");
-                        domainSelector.removeItem(selectedDomain); // Optional: update UI
+                        domainSelector.removeItem(selectedDomain);
                     } else {
                         JOptionPane.showMessageDialog(panel, "Failed to delete domain folder.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -216,10 +223,98 @@ public class UI extends JTabbedPane {
             }
         });
 
-        panel.add(topControls, BorderLayout.NORTH);
+        panel.add(framedTopControls, BorderLayout.NORTH);
         panel.add(new JScrollPane(outputArea), BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private JPanel createExtractorTab() {
+        // Initialize list models
+        endpointsModel = new DefaultListModel<>();
+        parametersModel = new DefaultListModel<>();
+        sourceMapsModel = new DefaultListModel<>();
+
+        // Main panel with padding
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Content panel with GridBagLayout for 3 horizontal sections
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
+        gbc.gridx = 0;
+
+        String[] labels = {" Endpoints  ", " Parameters ", " SourceMaps (extracted automatically during website crawling, if available)"};
+
+        gbc.gridy = 0;
+        contentPanel.add(createExtractorSectionPanel(labels[0], endpointsModel), gbc);
+
+        gbc.gridy = 1;
+        contentPanel.add(createExtractorSectionPanel(labels[1], parametersModel), gbc);
+
+        gbc.gridy = 2;
+        contentPanel.add(createExtractorSectionPanel(labels[2], sourceMapsModel), gbc);
+
+        // Add content panel at CENTER
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
+
+        // Create panel for buttons with GridLayout (1 row, 2 columns)
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 5, 5));
+
+        // Run Extraction button
+        JButton runButton = new JButton(" ▶ Run Extraction (for the selected domain in the Analysis tab)");
+        runButton.setFont(runButton.getFont().deriveFont(Font.BOLD));
+
+        runButton.addActionListener(e -> {
+            runButton.setEnabled(false);
+
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    performExtraction();
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    runButton.setEnabled(true);
+                    try {
+                        get(); // This will throw if doInBackground() threw
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(runButton.getParent(),
+                                "Error: " + ex.getCause().getMessage(), "Extraction Failed",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }.execute();
+        });
+
+        // Clear All button (light red)
+        JButton clearButton = new JButton(" ❌ Clear All");
+        clearButton.setFont(clearButton.getFont().deriveFont(Font.BOLD));
+
+        clearButton.addActionListener(e -> Helper.clearAll());
+
+        // Increase button height
+        Dimension buttonSize = new Dimension(0, 40);
+        runButton.setPreferredSize(buttonSize);
+        clearButton.setPreferredSize(buttonSize);
+
+        // Add buttons to panel
+        buttonPanel.add(clearButton);
+        buttonPanel.add(runButton);
+
+
+        // Add button panel to SOUTH
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return mainPanel;
     }
 
     private JPanel createToolsTab() {
@@ -239,13 +334,20 @@ public class UI extends JTabbedPane {
         setupPlaceholder(commandField, "Your Command Template");
 
         JButton addCommandButton = new JButton("➕ Add");
+        addCommandButton.setFont(addCommandButton.getFont().deriveFont(Font.BOLD));
         addCommandButton.setPreferredSize(new Dimension(80, 28));
 
         JPanel inputRow = new JPanel(new BorderLayout(5, 5));
         inputRow.add(nameField, BorderLayout.WEST);
         inputRow.add(commandField, BorderLayout.CENTER);
         inputRow.add(addCommandButton, BorderLayout.EAST);
-        addCommandPanel.add(inputRow, BorderLayout.CENTER);
+
+        // Add padding around items inside addCommandPanel
+        JPanel paddedInputRow = new JPanel(new BorderLayout());
+        paddedInputRow.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        paddedInputRow.add(inputRow, BorderLayout.CENTER);
+
+        addCommandPanel.add(paddedInputRow, BorderLayout.CENTER);
 
         // JSON Editor
         RSyntaxTextArea configEditor = new RSyntaxTextArea(20, 80);
@@ -277,6 +379,7 @@ public class UI extends JTabbedPane {
 
         // Clean Button
         JButton cleanButton = new JButton("❌ Delete File ");
+        cleanButton.setFont(cleanButton.getFont().deriveFont(Font.BOLD));
         cleanButton.setPreferredSize(new Dimension(Short.MAX_VALUE, 36));
         cleanButton.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(panel,
@@ -300,6 +403,7 @@ public class UI extends JTabbedPane {
 
         // Refresh Button
         JButton refreshButton = new JButton("🔃 Refresh ");
+        refreshButton.setFont(refreshButton.getFont().deriveFont(Font.BOLD));
         refreshButton.setPreferredSize(new Dimension(Short.MAX_VALUE, 36));
         refreshButton.addActionListener(e -> {
             try {
@@ -373,47 +477,9 @@ public class UI extends JTabbedPane {
 
         panel.add(topSection, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);  // Changed from cleanButton to buttonPanel
+        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
-    }
-
-    private JPanel createExtractorTab() {
-        // Initialize list models
-        endpointsModel = new DefaultListModel<>();
-        parametersModel = new DefaultListModel<>();
-        sourceMapsModel = new DefaultListModel<>();
-
-        // Main panel with padding
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-        // Content panel with GridBagLayout for 3 horizontal sections
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        // Configure GridBagLayout for 3 equal horizontal sections
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.weighty = 1.0; // Equal vertical distribution
-        gbc.weightx = 1.0; // Full width
-        gbc.gridx = 0;
-
-        // Data for the three sections
-        String[] labels = {" Endpoints  ", " Parameters ", " SourceMaps "};
-
-        // Create the three horizontal sections
-        gbc.gridy = 0;
-        contentPanel.add(createExtractorSectionPanel(labels[0], endpointsModel), gbc);
-
-        gbc.gridy = 1;
-        contentPanel.add(createExtractorSectionPanel(labels[1], parametersModel), gbc);
-
-        gbc.gridy = 2;
-        contentPanel.add(createExtractorSectionPanel(labels[2], sourceMapsModel), gbc);
-
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
-        return mainPanel;
     }
 
     private JPanel createExtractorSectionPanel(String title, DefaultListModel<String> listModel) {
@@ -946,6 +1012,21 @@ public class UI extends JTabbedPane {
             logging.logToError(e);
             return "// Failed to load tools.json\n{\n}";
         }
+    }
+
+    private void performExtraction() throws IOException, InterruptedException {
+        String selectedDomain = (String) domainSelector.getSelectedItem();
+        assert selectedDomain != null;
+        File target = new File(Main.DEFAULT_BASE_PATH.toFile(), selectedDomain);
+
+        if (UI.isEndpointsEnabled) {
+            Helper.runJSEndpoints(target);
+        }
+
+        if (UI.isParamsEnabled) {
+            Helper.runJSParams(target);
+        }
+
     }
 
 }

@@ -1,15 +1,14 @@
 import java.awt.Toolkit;
-import java.util.List;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.io.*;
-import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.net.URI;
 import java.security.MessageDigest;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -44,27 +43,6 @@ public class Helper {
         return sb.toString();
     }
 
-    public static String normalizeUrl(URI uri) {
-        StringBuilder cleanedUrl = new StringBuilder();
-        cleanedUrl.append(uri.getScheme()).append("://").append(uri.getHost());
-
-        int port = uri.getPort();
-        if (port != -1 && port != getDefaultPort(uri.getScheme())) {
-            cleanedUrl.append(":").append(port);
-        }
-
-        cleanedUrl.append(uri.getPath());
-        return cleanedUrl.toString();
-    }
-
-    public static int getDefaultPort(String scheme) {
-        return switch (scheme.toLowerCase()) {
-            case "http" -> 80;
-            case "https" -> 443;
-            default -> -1;
-        };
-    }
-
     public static Path getHierarchicalPath(URI uri) throws IOException {
         String host = uri.getHost(); // e.g., example.com
         String rawPath = uri.getPath(); // e.g., /assets/js/app.js
@@ -90,22 +68,6 @@ public class Helper {
         return dir.delete();
     }
 
-    public static byte[] decompressGzip(byte[] data) throws IOException {
-        try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(data));
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            gis.transferTo(out);
-            return out.toByteArray();
-        }
-    }
-
-    public static byte[] decompressDeflate(byte[] data) throws IOException {
-        try (InflaterInputStream iis = new InflaterInputStream(new ByteArrayInputStream(data));
-             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            iis.transferTo(out);
-            return out.toByteArray();
-        }
-    }
-
     // Methods to clear lists
     public static void clearEndpoints() {
         UI.endpointsModel.clear();
@@ -119,7 +81,7 @@ public class Helper {
         UI.sourceMapsModel.clear();
     }
 
-    public void clearAll() {
+    public static void clearAll() {
         clearEndpoints();
         clearParameters();
         clearSourceMaps();
@@ -200,23 +162,22 @@ public class Helper {
     public static void runJSEndpoints(File target) throws IOException, InterruptedException {
         String command = "node --no-warnings " +
                 Paths.get(Main.DEFAULT_BASE_PATH.getParent().toString(), "plugins", "JSEndpoints", "jsendpoints.js") +
-                " --file \"" + target.getAbsolutePath() + "\"";
-
+                " --directory \"" + target.getAbsolutePath() + "\"";
         String output = Helper.runCommandWithTarget(command, target).trim();
 
         // Parse output as JSON array using Gson
         Gson gson = new Gson();
         List<String> endpoints = gson.fromJson(output, new TypeToken<List<String>>() {}.getType());
 
-        for (String url : endpoints) {
-            addEndpointIfNotExists(url);
+        for (String item : endpoints) {
+            addEndpointIfNotExists(item);
         }
     }
 
     public static void runJSParams(File target) throws IOException, InterruptedException {
         String command = "node --no-warnings " +
                 Paths.get(Main.DEFAULT_BASE_PATH.getParent().toString(), "plugins", "JSParams", "jsparams.js") +
-                " --file \"" + target.getAbsolutePath() + "\"";
+                " --directory \"" + target.getAbsolutePath() + "\"";
 
         String output = Helper.runCommandWithTarget(command, target).trim();
 

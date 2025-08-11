@@ -59,16 +59,7 @@ public class ExtractAttributeScripts {
 
             Files.writeString(savePath, combinedJs, StandardOpenOption.CREATE_NEW);
             UI.loadDomainFolders();
-
-            if (UI.isEndpointsEnabled) {
-                Helper.runJSEndpoints(savePath.toFile());
-            }
-
-            if (UI.isParamsEnabled) {
-                Helper.runJSParams(savePath.toFile());
-            }
-
-
+            
             logging.logToOutput("[+] Saved attribute JS to: " + savePath + " (MD5: " + hash + ")");
         } catch (Exception e) {
             logging.logToError("[-] Error extracting attribute scripts: " + e.getMessage());

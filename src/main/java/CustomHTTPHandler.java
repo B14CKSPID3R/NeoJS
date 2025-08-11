@@ -13,14 +13,14 @@ import java.util.List;
 public class CustomHTTPHandler implements HttpHandler {
     MontoyaApi api;
     Logging logging;
-    JSUrlProcessor jsUrlProcessor;
+    JSLinkProcessor jsLinkProcessor;
     ExtractInlineScripts extractInlineScripts;
     ExtractAttributeScripts extractAttributeScripts;
 
     public CustomHTTPHandler(MontoyaApi api) {
         this.api = api;
         this.logging = api.logging();
-        this.jsUrlProcessor = new JSUrlProcessor(api);
+        this.jsLinkProcessor = new JSLinkProcessor(api);
         this.extractInlineScripts = new ExtractInlineScripts(api);
         this.extractAttributeScripts = new ExtractAttributeScripts(api);
     }
@@ -66,25 +66,26 @@ public class CustomHTTPHandler implements HttpHandler {
         String url = request.url();
         List<HttpHeader> headers = request.headers();
         String path = request.pathWithoutQuery().toLowerCase();
+        String body = httpResponseReceived.bodyToString();
+        URI uri = null;
+        try {
+            uri = new URI(request.url());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
 
         if (mimeType == MimeType.HTML) {
-            String body = httpResponseReceived.bodyToString();
             if (isTrulyHtml(body)) {
-                try {
-                    URI uri = new URI(request.url());
-                    extractInlineScripts.saveInlineScripts(body, uri);
-                    extractAttributeScripts.extractAndSave(body, uri);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
+                extractInlineScripts.saveInlineScripts(body, uri);
+                extractAttributeScripts.extractAndSave(body, uri);
             }
         }
 
         boolean isJsByExtension = path.endsWith(".js") || path.endsWith(".ts");
-        boolean isJsByContentType = mimeType != null && mimeType.toString().equalsIgnoreCase("script");
+        boolean isJsByContentType = mimeType == MimeType.SCRIPT;
 
         if (isJsByExtension || isJsByContentType) {
-            jsUrlProcessor.addUrl(url, headers);
+            jsLinkProcessor.process(body, url, headers);
         }
 
         return ResponseReceivedAction.continueWith(httpResponseReceived);

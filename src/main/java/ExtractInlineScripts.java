@@ -57,14 +57,6 @@ public class ExtractInlineScripts {
                 Files.writeString(savePath, scriptContent, StandardOpenOption.CREATE_NEW);
                 UI.loadDomainFolders();
 
-                if (UI.isEndpointsEnabled) {
-                    Helper.runJSEndpoints(savePath.toFile());
-                }
-
-                if (UI.isParamsEnabled) {
-                    Helper.runJSParams(savePath.toFile());
-                }
-
                 logging.logToOutput("[+] Saved inline script: " + savePath + " (MD5: " + md5 + ")");
             }
         } catch (Exception e) {

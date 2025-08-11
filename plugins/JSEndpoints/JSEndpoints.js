@@ -29,6 +29,9 @@ const FALSE_POSITIVE_PATTERNS = [
   /function/i,
   /<\d+/,
   />>>?\d*/,
+  /\/vnd\.*/,
+  /\/prs\.*/,
+  /\/*[=<>]+/,
   /writeUInt/, /read/, /props/, /slidesTo/, /_block/
 ];
 
