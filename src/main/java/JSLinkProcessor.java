@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -103,12 +104,12 @@ public class JSLinkProcessor {
         if (isShuttingDown.get()) return;
 
         try {
-            String mapUrl = url + ".map";
+            String mapUrl = getSourceMapUrl(url);
             URI mapUri = new URI(mapUrl);
 
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                     .uri(mapUri)
-                    .method("HEAD", HttpRequest.BodyPublishers.noBody());
+                    .method("GET", HttpRequest.BodyPublishers.noBody()); // GET to get Content-Type
 
             Set<String> restricted = Set.of(
                     "connection", "host", "content-length", "expect",
@@ -128,8 +129,20 @@ public class JSLinkProcessor {
             );
 
             if (response.statusCode() == 200) {
-                Helper.addSourceMapIfNotExists(mapUrl);
-                logging.logToOutput("[+] Source map exists: " + mapUrl);
+                Optional<String> contentTypeOpt = response.headers()
+                        .firstValue("Content-Type");
+
+                if (contentTypeOpt.isPresent()) {
+                    String contentType = contentTypeOpt.get().toLowerCase();
+                    if (contentType.contains("application/javascript") || contentType.contains("text/javascript")) {
+                        Helper.addSourceMapIfNotExists(mapUrl);
+                        logging.logToOutput("[+] Source map exists and is JS: " + mapUrl);
+                    } else {
+                        logging.logToOutput("[-] Found file at " + mapUrl + " but not JS: " + contentType);
+                    }
+                } else {
+                    logging.logToOutput("[-] No Content-Type header for: " + mapUrl);
+                }
             } else {
                 logging.logToOutput("[-] No source map at: " + mapUrl + " - Status: " + response.statusCode());
             }
@@ -139,6 +152,29 @@ public class JSLinkProcessor {
             }
         }
     }
+
+    // Utility method to insert .map correctly
+    private String getSourceMapUrl(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String path = uri.getPath(); // e.g., /1.js
+        int lastDot = path.lastIndexOf('.');
+        if (lastDot == -1) {
+            path = path + ".map";
+        } else {
+            path = path.substring(0, lastDot + 3) + ".map"; // +3 for .js
+        }
+
+        // rebuild URI with original query and fragment
+        URI mapUri = new URI(
+                uri.getScheme(),
+                uri.getAuthority(),
+                path,
+                uri.getQuery(),
+                uri.getFragment()
+        );
+        return mapUri.toString();
+    }
+
 
     /**
      * Stops workers and clears queue.
