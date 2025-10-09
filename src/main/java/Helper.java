@@ -125,7 +125,9 @@ public class Helper {
         }
     }
 
-    public static String runCommandWithTarget(String command, File target) throws IOException, InterruptedException {
+    public static String runCommandWithTarget(String command, File target)
+            throws IOException, InterruptedException {
+
         String[] cmd;
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win")) {
@@ -143,21 +145,34 @@ public class Helper {
         Process process = pb.start();
         StringBuilder output = new StringBuilder();
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append(System.lineSeparator());
+        // 🔸 Read output continuously in a background thread
+        Thread outputThread = new Thread(() -> {
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    synchronized (output) {
+                        output.append(line).append(System.lineSeparator());
+                    }
+                    System.out.println("[CMD] " + line); // Optional: show real-time output in console
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }
+        });
 
-        int exitCode = process.waitFor();
+        outputThread.start();
+
+        int exitCode = process.waitFor();  // Wait for process to finish
+        outputThread.join();               // Wait for output to finish reading
+
         if (exitCode != 0) {
-            throw new RuntimeException("Command exited with code: " + exitCode);
+            throw new RuntimeException("Command exited with code: " + exitCode + "\nOutput:\n" + output);
         }
 
         return output.toString();
     }
+
 
     public static void runJSEndpoints(File target) throws IOException, InterruptedException {
         String command = "node --no-warnings " +
