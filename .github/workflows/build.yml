@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+    
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    
+    - name: Build plugins using npm
+      run: |
+        chmod +x build_plugins.sh
+        ./build_plugins.sh
+    
+    - name: Build with Gradle
+      run: ./gradlew clean build
+    
+    - name: Get version from gradle.properties
+      id: version
+      run: |
+        VERSION=$(grep "^version" gradle.properties | cut -d'=' -f2)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+    
+    - name: Create Release and Upload Artifact
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ env.VERSION }}
+        name: Release v${{ env.VERSION }}
+        files: |
+          build/libs/*.jar
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
