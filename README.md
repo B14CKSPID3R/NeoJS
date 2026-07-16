@@ -1,7 +1,7 @@
 # NeoJS 🔍
 
 <div align="center">
-  <img src="banner.jpg" alt="NeoJS Banner" width="100%"><br>
+  <img src="banner.png" alt="NeoJS Banner" width="100%"><br>
 </div>
 
 <div align="center">
