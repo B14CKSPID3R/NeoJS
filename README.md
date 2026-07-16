@@ -117,6 +117,8 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 5. **Start Browsing**: Begin your web application testing (Clear your cache or use Burp Suite's browser to avoid caching issues)
 6. **Review Results**: Run your favorite tools that you've added on Tools tab and check the Extractor tab for discovered endpoints/parameters/source map files
 
+**Important Note:** If you want to use Neo-JSRequest (for AST Analysis in the Analysis tab), JSParams (extract parameters in the Extractor tab) and JSEndpoints (extract endpoints in the Extractor tab), you must install Node.js and ensure that the `node` command is available in your CMD/Terminal.
+
 ### Advanced Configuration
 
 #### Analysis Settings
