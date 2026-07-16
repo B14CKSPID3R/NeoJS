@@ -178,5 +178,3 @@ node jsrequests.js --proxy http://127.0.0.1:8080 --silent <dirpath>
 This project is licensed under the MIT License.
 
 </div> 
-"" 
-"" 
