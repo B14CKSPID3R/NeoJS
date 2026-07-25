@@ -35,12 +35,12 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 ## 🎥 Demo Video
 
 <div align="center">
-  <a href="demo/neojs.mp4">
+  <a href="demo/NeoJS.mp4">
     <img src="demo/thumbnail.png" alt="NeoJS Demo" width="80%" style="max-width: 800px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
   </a>
   <br>
   <br>
-  <a href="demo/neojs.mp4">▶️ Watch the demo video</a>
+  <a href="demo/NeoJS.mp4">▶️ Watch the demo video</a>
   <br>
   <sub><em>NeoJS in action - JavaScript analysis and endpoint extraction</em></sub>
 </div>
