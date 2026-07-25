@@ -21,6 +21,15 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
     
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install esbuild globally
+      run: npm install -g esbuild
+    
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
     
