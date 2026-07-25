@@ -82,7 +82,7 @@ NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript a
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/B14CK-SPID3R/NeoJS.git
+   git clone https://github.com/B14CKSPID3R/NeoJS.git
    cd NeoJS
    ```
 

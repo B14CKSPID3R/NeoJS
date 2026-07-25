@@ -836,7 +836,7 @@ public class UI extends JTabbedPane {
         createdByLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         footer.add(createdByLabel);
 
-        JButton githubButton = createLinkButton("B14CK-SPID3R", "https://github.com/B14CK-SPID3R");
+        JButton githubButton = createLinkButton("B14CK-SPID3R", "https://github.com/B14CKSPID3R");
         githubButton.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
         footer.add(githubButton);
 
