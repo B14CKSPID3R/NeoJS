@@ -46,6 +46,9 @@ jobs:
       run: |
         chmod +x build_plugins.sh
         ./build_plugins.sh
+
+    - name: Make gradlew executable
+      run: chmod +x gradlew
     
     - name: Build with Gradle
       run: ./gradlew clean build
