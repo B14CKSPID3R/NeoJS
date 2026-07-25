@@ -32,6 +32,20 @@
 
 NeoJS is a powerful Burp Suite extension designed for comprehensive JavaScript analysis, endpoint extraction, and automated request generation. It provides real-time JavaScript processing, parameter discovery, and intelligent request crafting capabilities for web application security testing.
 
+## 🎥 Demo Video
+
+<div align="center">
+
+  <video width="80%" controls>
+    <source src="demo/neojs.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  
+  <br>
+  <em>NeoJS in action - JavaScript analysis and endpoint extraction</em>
+
+</div>
+
 ## ✨ Key Features
 
 ### 🔍 **Real-time JavaScript Analysis**
